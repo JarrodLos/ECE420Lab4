@@ -10,10 +10,11 @@
  * References:  
  */
 
-
+#define LAB4_EXTEND
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpi.h>
+#include <math.h>
+// #include <mpi.h>
 #include "Lab4_IO.h"
 #include "timer.h"
 
@@ -33,33 +34,19 @@ int main(void) {
     double *collected_r;
     double cst_addapted_threshold;
     double error;
-    FILE *fp, *ip;
+    FILE *ip;
 
     /* Init, Get rank for each process & Find total # of processes used */
     // MPI_Init(NULL, NULL);
     // MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     // MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
 
-    // Load the data and simple verification
-    if ((fp = fopen("data_output", "r")) == NULL ){
-    	printf("Error loading the data_output.\n");
-        return 253;
-    }
-    fscanf(fp, "%d\n%lf\n", &collected_nodecount, &error);
     if ((ip = fopen("data_input_meta","r")) == NULL) {
         printf("Error opening the data_input_meta file.\n");
         return 254;
     }
     fscanf(ip, "%d\n", &nodecount);
-    if (nodecount != collected_nodecount){
-        printf("Problem size does not match!\n");
-        return 2;
-    }
     fclose(ip);
-    collected_r = malloc(collected_nodecount * sizeof(double));
-    for ( i = 0; i < collected_nodecount; ++i)
-        fscanf(fp, "%lf\n", &collected_r[i]);
-    fclose(fp);
 
     // Adjust the threshold according to the problem size
     cst_addapted_threshold = THRESHOLD;
@@ -90,28 +77,20 @@ int main(void) {
         for ( i=0; i<nodecount; ++i){
             contribution[i] = r[i] / nodehead[i].num_out_links * DAMPING_FACTOR;
         }
-    }while(rel_error(r, r_pre, nodecount) >= EPSILON);
+    }
+    while(rel_error(r, r_pre, nodecount) >= EPSILON);
     // GET_TIME(end);
     // printf("Program converged at %d th iteration.\nElapsed time %f.\n", iterationcount, end-start);
+
+    /* Save the data to file for Lab 4 */
+    double end_time = 10.0;
+    Lab4_saveoutput(r, nodecount, end_time);
 
     // post processing
     node_destroy(nodehead, nodecount);
     free(contribution);
     
-    // Compare the result 
-    error = rel_error(collected_r, r, nodecount);
-    printf ("The relative error against the reference result is %e .\n", error);
-    free(r); free(r_pre); free(collected_r);
-    if ( error < cst_addapted_threshold){
-        printf("Congratulations! Your result is correct!\n");
-        return 0;
-    }else{
-        printf("Sorry. Your result is wrong.\n");
-        return 1;
-    }
-
     /* Shut down MPI */
     //MPI_Finalize();
-
     return 0;
 }

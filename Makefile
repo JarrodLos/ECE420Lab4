@@ -8,12 +8,15 @@ CFLAGS  = -g -Wall -o
 # Executable 1: PageRank Implementation with MPI
 main: main.c Lab4_IO.c timer.h 
 	$(CC) $(CFLAGS) main main.c Lab4_IO.c
+	# mpicc -g -Wall -o main main.c Lab4_IO.c
 
 # Clean:
 
 
 # To RUN:
-	# Single Computer:      mpiexec -n <number of processes> ./main
+	# SerialTester:         gcc serialtester.c Lab4_IO.c -o serialtester -lm
+	# SerialMain:           gcc main.c Lab4_IO.c -o main -lm
+	# Single Computer:      mpiexec -n 1 ./main
 	# Vm Cluster (On VM):   mpirun -np 4 -f hosts ./main
 
 # Discuss your findings under the following problem sizes: (repeat x10 & average performance)

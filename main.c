@@ -22,7 +22,8 @@
 #define DAMPING_FACTOR 0.85
 #define THRESHOLD 0.0001
 
-int main(void) {
+int main(int argc, char *argv[]) {
+    printf("total num of arguments: %d", argc);
     int my_rank, comm_sz;
     struct node *nodehead;
     int nodecount, local_StartIndex, local_EndIndex;

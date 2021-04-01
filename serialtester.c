@@ -17,14 +17,13 @@
 #define LAB4_EXTEND
 
 #include <stdio.h>
-#define EPSILON 0.00001
-#define DAMPING_FACTOR 0.85
-#define THRESHOLD 0.0001#include <stdlib.h>
+#include <stdlib.h>
 #include <math.h>
 #include "Lab4_IO.h"
 
 #define EPSILON 0.00001
 #define DAMPING_FACTOR 0.85
+
 #define THRESHOLD 0.0001
 
 int main (int argc, char* argv[]){
@@ -44,12 +43,49 @@ int main (int argc, char* argv[]){
     if ((fp = fopen("data_output", "r")) == NULL ){
     	printf("Error loading the data_output.\n");
         return 253;
+    } fscanf(fp, "%d\n%lf\n", &collected_nodecount, &error);
+
+    /* For use with a custom data input */
+    int testFile; 
+    if (argc == 1) {
+        testFile = 0;
+        printf("Test File #0");
+        if ((ip = fopen("data_input_meta","r")) == NULL) {
+            printf("Error opening the data_input_meta file.\n");
+            return 254;
+        }
+    } else {
+        if (strcmp(argv[1], "1") == 0) {
+            testFile = 1;
+            printf("Test File #1");
+            if ((ip = fopen("1112_nodes_input_meta","r")) == NULL) {
+                printf("Error opening the 1112_nodes_input_meta file.\n");
+                return 254;
+            }
+        } else if (strcmp(argv[1], "2") == 0) {
+            testFile = 2;
+            printf("Test File #2");
+            if ((ip = fopen("5424_nodes_input_meta","r")) == NULL) {
+                printf("Error opening the 5424_nodes_input_meta file.\n");
+                return 254;
+            }
+        } else if (strcmp(argv[1], "3") == 0) {
+            testFile = 3;
+            printf("Test File #3");
+            if ((ip = fopen("10000_nodes_input_meta","r")) == NULL) {
+                printf("Error opening the 5424_nodes_input_meta file.\n");
+                return 254;
+            }
+        } else {
+            printf("Error reading custom input name.\n");
+            return 254;
+        }
     }
-    fscanf(fp, "%d\n%lf\n", &collected_nodecount, &error);
-    if ((ip = fopen("data_input_meta","r")) == NULL) {
-        printf("Error opening the data_input_meta file.\n");
-        return 254;
-    }
+    // if ((ip = fopen("data_input_meta","r")) == NULL) {
+    //     printf("Error opening the data_input_meta file.\n");
+    //     return 254;
+    // }
+    
     fscanf(ip, "%d\n", &nodecount);
     if (nodecount != collected_nodecount){
         printf("Problem size does not match!\n");
@@ -64,7 +100,10 @@ int main (int argc, char* argv[]){
     // Adjust the threshold according to the problem size
     cst_addapted_threshold = THRESHOLD;
     
-    if (node_init(&nodehead, 0, nodecount)) return 254;
+    /* Edited to support custom inputs */
+    //if (node_init(&nodehead, 0, nodecount)) return 254;
+    if (node_init(&nodehead, 0, nodecount, testFile)) return 254;
+
     // initialize variables
     r = malloc(nodecount * sizeof(double));
     r_pre = malloc(nodecount * sizeof(double));

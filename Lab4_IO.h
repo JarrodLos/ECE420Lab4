@@ -22,7 +22,8 @@ struct node{
     int num_in_links;
     int num_out_links;
 };
-int node_init(struct node **nodehead, int start, int end); // Load the input data for index within a range. Including the start but not including the end!
+int node_init(struct node **nodehead, int start, int end, int testFile); // Load the input data for index within a range. Including the start but not including the end!
 int node_destroy(struct node *nodehead, int num_nodes);
 #endif // LAB4_EXTEND
 #endif // LAB4_H_INCLUDE
+

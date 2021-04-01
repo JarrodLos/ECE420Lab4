@@ -44,52 +44,16 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
 
-    /* Check for custom test files (Can remove for final version) 
-     * Note: Change IO file, header and node_init() to original
-     */
-    int testFile; 
-    if (argc == 1) {
-        testFile = 0;
-        if ((ip = fopen("data_input_meta","r")) == NULL) {
-            printf("Error opening the data_input_meta file.\n");
-            return 254;
-        }
-    } else {
-        if (strcmp(argv[1], "1") == 0) {
-            testFile = 1;
-            if ((ip = fopen("1112_nodes_input_meta","r")) == NULL) {
-                printf("Error opening the 1112_nodes_input_meta file.\n");
-                return 254;
-            }
-        } else if (strcmp(argv[1], "2") == 0) {
-            testFile = 2;
-            if ((ip = fopen("5424_nodes_input_meta","r")) == NULL) {
-                printf("Error opening the 5424_nodes_input_meta file.\n");
-                return 254;
-            }
-        } else if (strcmp(argv[1], "3") == 0) {
-            testFile = 3;
-            if ((ip = fopen("10000_nodes_input_meta","r")) == NULL) {
-                printf("Error opening the 5424_nodes_input_meta file.\n");
-                return 254;
-            }
-        } else {
-            printf("Error reading custom input name.\n");
-            return 254;
-        }
-    }
-
     /* Open the meta data file created from datatrim.c & pull out the node count */
-    // if ((ip = fopen("data_input_meta","r")) == NULL) {
-    //     printf("Error opening the data_input_meta file.\n");
-    //     return 254;
-    // }
+    if ((ip = fopen("data_input_meta","r")) == NULL) {
+        printf("Error opening the data_input_meta file.\n");
+        return 254;
+    } 
     fscanf(ip, "%d\n", &nodecount);
     fclose(ip);
     
     /* Update this to the original node_init() & fix header file as well */
-    if (node_init(&nodehead, 0, nodecount, testFile)) return 254;
-    // if (node_init(&nodehead, 0, nodecount)) return 254;
+    if (node_init(&nodehead, 0, nodecount)) return 254;
     
     /* Calculate partition size for each process */
     partition = (int) nodecount/comm_sz;

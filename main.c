@@ -23,7 +23,7 @@
 #define THRESHOLD 0.0001
 
 int main(int argc, char *argv[]) {
-    printf("total num of arguments: %d", argc);
+    
     int my_rank, comm_sz;
     struct node *nodehead;
     int nodecount, local_StartIndex, local_EndIndex;
@@ -43,6 +43,18 @@ int main(int argc, char *argv[]) {
     MPI_Init(NULL, NULL);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
+    if (argc == 1) {
+        if ((ip = fopen("data_input_meta","r")) == NULL) {
+            printf("Error opening the data_input_meta file.\n");
+            return 254;
+        }
+    } else {
+        printf("Accessing data input file: %s\n", argv[1]);
+        if ((ip = fopen(argv[1],"r")) == NULL) {
+            printf("Error opening the data_input_meta file.\n");
+            return 254;
+        }
+    }
 
     if ((ip = fopen("data_input_meta","r")) == NULL) {
         printf("Error opening the data_input_meta file.\n");

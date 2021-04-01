@@ -8,7 +8,6 @@
 int Lab4_saveoutput(double *R, int nodecount, double Time){
 /*
     Save the data to file for Lab 4 
-
     -----
     Input:
     int *R         pointer to the result array 
@@ -18,7 +17,6 @@ int Lab4_saveoutput(double *R, int nodecount, double Time){
     -----
     Output:
     data_output the stored data
-
     -----
     Example:
     lab4_saveoutput(R, nodecount, Time);
@@ -39,7 +37,7 @@ int Lab4_saveoutput(double *R, int nodecount, double Time){
 
 #ifdef LAB4_EXTEND
 
-int node_init(struct node **nodehead, int start, int end){
+int node_init(struct node **nodehead, int start, int end, int testFile){
     FILE *ip;
     int i, nodecount;
     int src, dst;
@@ -47,16 +45,42 @@ int node_init(struct node **nodehead, int start, int end){
     int *index; //keep track of the outlink list storing position
     int num_nodes = end - start;
 
+    /* Testing purposes: Takes custom input */
+    const char *meta_file_name;
+    const char *link_file_name;
+    if (testFile == 0) {
+        meta_file_name = "data_input_meta";
+        link_file_name = "data_input_link";
+
+    } else if (testFile == 1) {
+        meta_file_name = "1112_nodes_input_meta";
+        link_file_name = "1112_nodes_input_link";
+
+    } else if (testFile == 2) {
+        meta_file_name = "5424_nodes_input_meta";
+        link_file_name = "5424_nodes_input_link";
+
+    } else if (testFile == 3) {
+        meta_file_name = "10000_nodes_input_meta";
+        link_file_name = "10000_nodes_input_link";
+    
+    } else {
+        printf("Error reading custom input name (IO).\n");
+        return -1;
+    }
+
     // deal with the meta data and allocate space
     (*nodehead) = malloc(num_nodes * sizeof(struct node));
-    if ((ip = fopen("data_input_meta","r")) == NULL) {
+    if ((ip = fopen(meta_file_name,"r")) == NULL) {
         printf("Error opening the data_input_meta file.\n");
         return -1;
     }
     fscanf(ip, "%d\n", &nodecount);
+
     for (i=0; i<start; ++i){ // allocate to the right place
         fscanf(ip, "%d\t%d\t%d\n", &nodeID, &num_in, &num_out);
     }
+
     for ( i = start; i < end && i < nodecount; ++i){ // handlling the dumping case
         fscanf(ip, "%d\t%d\t%d\n", &nodeID, &num_in, &num_out);
         if (nodeID != i){
@@ -74,23 +98,26 @@ int node_init(struct node **nodehead, int start, int end){
             (*nodehead)[i-start].num_out_links = nodecount;
             (*nodehead)[i-start].inlinks = malloc(sizeof(int));
         }
-    }
+    } 
     // Load the link informations
-    if ((ip = fopen("data_input_link","r")) == NULL) {
+    if ((ip = fopen(link_file_name,"r")) == NULL) {
         printf("Error opening the data_input_link file.\n");
         return -3;
     }
     index = malloc(num_nodes * sizeof(int));
     for(i=0; i<num_nodes; ++i){
         index[i] = 0;
-    }
+    } 
+    
     while(!feof(ip)){
         fscanf(ip, "%d\t%d\n", &src, &dst);
         if (dst >= start && dst < end)
             (*nodehead)[dst - start].inlinks[index[dst - start]++] = src;
     }
+
     free(index);
     fclose(ip);
+
     return 0;
 }
 
